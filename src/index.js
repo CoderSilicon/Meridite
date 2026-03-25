@@ -1,10 +1,11 @@
 import { Server } from "socket.io";
 import { createServer } from "node:http";
 
+const PORT = process.env.PORT || 3000;
 const httpServer = createServer();
 const io = new Server(httpServer, {
   cors: {
-    origin: "*", // Configure this properly in production
+    origin: "meridian-csox.vercel.app",
     methods: ["GET", "POST"]
   }
 });
@@ -43,6 +44,6 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(3000, () => {
+httpServer.listen(PORT, "0.0.0.0", () => {
   console.log("✅ Signaling server running on port 3000");
 });
