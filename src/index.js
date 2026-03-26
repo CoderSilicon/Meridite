@@ -1,17 +1,35 @@
+import express from "express";
+import cors from "cors";
 import { Server } from "socket.io";
 import { createServer } from "node:http";
 
 const PORT = process.env.PORT || 3000;
-const httpServer = createServer();
+const app = express();
+const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
     origin: "*",
-    methods: ["GET", "POST"]
-  }
+    methods: ["GET", "POST"],
+  },
+});
+
+app.use(
+  cors({
+    origin: "*", // Or your specific frontend URL like "http://localhost:5173"
+    methods: ["GET", "POST"],
+  }),
+);
+app.get("/", (req, res) => {
+  res.send("Welcome to Meridite.");
+});
+
+app.get("/alive", (req, res) => {
+  console.log("It is alive")
+  res.send(true);
 });
 
 io.on("connection", (socket) => {
-  console.log(`Client connected: ${socket.id}`);
+  console.log(`Peer ${socket.id} connected the room`);
 
   // Join a room based on the code
   socket.on("create-room", ({ code }) => {
@@ -40,10 +58,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
+    socket.to(code).emit("disconnect", candidate)
     console.log(`Client disconnected: ${socket.id}`);
   });
 });
 
 httpServer.listen(PORT, "0.0.0.0", () => {
-  console.log("✅ Signaling server running on port 3000");
+  console.log("[*] :) Signaling server running on port " + PORT);
 });
