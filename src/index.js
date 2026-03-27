@@ -15,7 +15,7 @@ const io = new Server(httpServer, {
 
 app.use(
   cors({
-    origin: "*", // Or your specific frontend URL like "http://localhost:5173"
+    origin: "*", 
     methods: ["GET", "POST"],
   }),
 );
@@ -57,10 +57,15 @@ io.on("connection", (socket) => {
     socket.to(code).emit("candidate", candidate);
   });
 
-  socket.on("disconnect", () => {
-    socket.to(code).emit("disconnect", candidate)
-    console.log(`Client disconnected: ${socket.id}`);
-  });
+  socket.on("disconnect", ({ code }) => {
+  // Tell everyone else in the room that this peer is gone
+  socket.to(code).emit("receiver-left");
+  socket.leave(code);
+});
+
+  // socket.on("disconnect", () => {
+  //   console.log(`Client disconnected: ${socket.id}`);
+  // });
 });
 
 httpServer.listen(PORT, "0.0.0.0", () => {
