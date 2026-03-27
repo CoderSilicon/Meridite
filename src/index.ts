@@ -1,4 +1,5 @@
 import express from "express";
+import { Request, Response } from "express";
 import cors from "cors";
 import { Server, Socket } from "socket.io";
 import { createServer } from "node:http";
@@ -35,7 +36,7 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
 
 app.use(cors({ origin: true }));
 
-app.get("/alive", (_, res) => {
+app.get("/alive", (_: Request, res:Response) => {
   res.status(200).send(true);
 });
 
